@@ -30,6 +30,12 @@ from .. import utils
 from ....py.utils import files
 from ....py.utils import console
 
+# todo:
+## theme -> all nt courses
+## nt -> load theme
+## existing nt -> disable / enable theme
+## rename nt
+## disable renaming existing nts
 
 class MemriseImportSettings(QDialog):
     def toggleCellCheckbox(self, cellWidget):
@@ -54,10 +60,15 @@ class MemriseImportSettings(QDialog):
 
         noteType_drop = NoScrollComboBox()
         noteType_drop.addItems([f"(auto {n+1})" for n in range(len(self.courseTabs))])
-        # noteType_drop.insertSeparator(noteType_drop.count())
-        # noteType_drop.addItems([m["name"] for m in mw.col.models.all()])
+        noteType_drop.insertSeparator(noteType_drop.count())
+        noteType_drop.addItems([m["name"] for m in self.models])
         noteType_drop.setCurrentIndex(row)
         self.coursesTable.setCellWidget(row, 1, noteType_drop)
+
+        theme_drop = NoScrollComboBox()
+        theme_drop.addItems(self.themes)
+        theme_drop.setCurrentIndex(utils.default_theme(self.themes))
+        self.coursesTable.setCellWidget(row, 2, theme_drop)
 
         import_checkbox = QCheckBox()
         import_checkbox.setChecked(True)
@@ -67,7 +78,7 @@ class MemriseImportSettings(QDialog):
         checkbox_layout.setContentsMargins(0, 0, 0, 0)
         checkbox_cell.setLayout(checkbox_layout)
         checkbox_layout.addWidget(import_checkbox)
-        self.coursesTable.setCellWidget(row, 2, checkbox_cell)
+        self.coursesTable.setCellWidget(row, 3, checkbox_cell)
 
 
     def __init__(self, courses):
@@ -95,7 +106,8 @@ class MemriseImportSettings(QDialog):
             }
         """
 
-
+        self.models = mw.col.models.all()
+        self.themes = utils.list_themes()
 
         ## Widgets
 
@@ -104,13 +116,14 @@ class MemriseImportSettings(QDialog):
         coursesLable = QLabel("Courses")
         font_metrics = QFontMetrics(coursesLable.font())
         lh = font_metrics.lineSpacing()
-        self.setMinimumWidth(36 * lh)
+        self.setMinimumWidth(42 * lh)
 
         # Main table
-        self.coursesTable = QTableWidget(0, 3)
+        self.coursesTable = QTableWidget(0, 4)
         self.setHeadersWithTooltips(self.coursesTable, [
             ("Course", None),
             ("Note Type", None),
+            ("Theme", None),
             ("Import", None)])
         self.coursesTable.horizontalHeader().setMinimumSectionSize(2 * lh)
         self.coursesTable.setSelectionMode(QtWidgets.QTableWidget.SelectionMode.NoSelection)
@@ -124,17 +137,13 @@ class MemriseImportSettings(QDialog):
         self.coursesTable.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
         headerMaster.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
         self.coursesTable.setColumnWidth(1, int(6 * lh))
-        self.coursesTable.setColumnWidth(2, int(3.5 * lh))
+        self.coursesTable.setColumnWidth(2, int(5.5 * lh))
+        self.coursesTable.setColumnWidth(3, int(3.5 * lh))
         headerMaster.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Interactive)
         headerMaster.setSectionResizeMode(2, QtWidgets.QHeaderView.ResizeMode.Fixed)
+        headerMaster.setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeMode.Fixed)
         headerMaster.setMinimumSectionSize(3 * lh)
         headerMaster.setMaximumSectionSize(15 * lh)
-
-        # theme
-        self.theme_drop = NoScrollComboBox() 
-        themeList = utils.list_themes()
-        self.theme_drop.addItems(themeList)
-        self.theme_drop.setCurrentIndex(utils.default_theme(themeList))
 
         # tests group
         self.audioTests_checkbox = QCheckBox()
@@ -178,12 +187,6 @@ class MemriseImportSettings(QDialog):
 
         # layout.addWidget(coursesLable)
         layout.addWidget(self.coursesTable)
-
-        theme_row = QHBoxLayout()
-        theme_row.addStretch()
-        theme_row.addWidget(QLabel("<b>Color Theme</b>:")) 
-        theme_row.addWidget(self.theme_drop)
-        layout.addLayout(theme_row)
 
         importOptions_group = QGroupBox("Import:")
         importOptions_layout = QVBoxLayout()
@@ -308,9 +311,9 @@ class MemriseImportSettings(QDialog):
     def course_options(self):
         importTabs = []
         for row in range(len(self.courseTabs)):
-            if self.coursesTable.cellWidget(row, 2).layout().itemAt(0).widget().isChecked():
+            if self.coursesTable.cellWidget(row, 3).layout().itemAt(0).widget().isChecked():
                 importTabs.append(self.courseTabs[row])
-                # importTabs[-1]["Theme"] = self.coursesTable.cellWidget(row, 1).currentText()
+                importTabs[-1]["Theme"] = self.coursesTable.cellWidget(row, 2).currentText()
                 importTabs[-1]["Note Type"] = self.coursesTable.cellWidget(row, 1).currentText()
                 importTabs[-1]["NT_isNew"] = self.coursesTable.cellWidget(row, 1).currentIndex() < len(self.courseTabs)
 
@@ -318,7 +321,6 @@ class MemriseImportSettings(QDialog):
 
     def import_options(self):
         return {
-                "theme": self.theme_drop.currentText(),
                 "import::meta": self.meta_checkbox.isChecked(),
                 "import::media": self.media_checkbox.isChecked(),
                 "import::revlog": self.scheduling_checkbox.isChecked(),
