@@ -31,7 +31,6 @@ from ....py.utils import files
 from ....py.utils import console
 
 # todo:
-## theme -> all nt courses
 ## nt -> load theme
 ## existing nt -> disable / enable theme
 ## rename nt
@@ -51,6 +50,23 @@ class MemriseImportSettings(QDialog):
                 header_widget.setToolTip(tooltip)
             table.setHorizontalHeaderItem(i, header_widget)
 
+
+    def switch_theme(self):
+        # find index
+        for r in range(len(self.courseTabs)):
+            if self.coursesTable.cellWidget(r, 2) == self.sender():
+                break
+        new_index = self.coursesTable.cellWidget(r, 2).currentIndex()
+        affected_NT = self.coursesTable.cellWidget(r, 1).currentIndex()
+
+        for rC in range(len(self.courseTabs)):
+            if (
+                not self.coursesTable.cellWidget(rC, 2) == self.sender()
+                and self.coursesTable.cellWidget(rC, 1).currentIndex() == affected_NT
+            ):
+                self.coursesTable.cellWidget(rC, 2).setCurrentIndex(new_index)
+
+
     def add_courseRow(self, path):
         row = self.coursesTable.rowCount()
         self.coursesTable.setRowCount(row + 1)
@@ -69,6 +85,8 @@ class MemriseImportSettings(QDialog):
         theme_drop.addItems(self.themes)
         theme_drop.setCurrentIndex(utils.default_theme(self.themes))
         self.coursesTable.setCellWidget(row, 2, theme_drop)
+
+        theme_drop.currentIndexChanged.connect(self.switch_theme)
 
         import_checkbox = QCheckBox()
         import_checkbox.setChecked(True)
