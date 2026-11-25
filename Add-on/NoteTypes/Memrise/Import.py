@@ -35,19 +35,15 @@ from aqt.utils import tooltip
 from ...py.utils import console
 
 # # import
-# # # merge notes (learnable id == in different directions??)
+# # # !merge notes (learnable id == in different directions??)
 # # # reverse Q
-# # # revlog
+# # # !revlog
 
 # # choices
 # # # fill
 # # # convert img and audio 
 
-# # interface
 # # # !progress bar
-# # # renamable NTs
-# # # move theme inside the table ( existing NT - deactivate)
-
 
 
 # heuristics

@@ -33,9 +33,8 @@ from ....py.utils import files
 # from ....py.utils import console
 
 # todo:
-## rename nt
-## unchecked import -> disable theme and nt
 ## disable renaming existing nts
+## unchecked import -> disable theme and nt
 
 class MemriseImportSettings(QDialog):
     def toggleCellCheckbox(self, cellWidget):
@@ -62,7 +61,7 @@ class MemriseImportSettings(QDialog):
 
 
     def switch_NT(self):
-        # determine index
+        # determine row
         for r in range(len(self.courseTabs)):
             if self.noteTypeWidget(r) == self.sender():
                 break
@@ -85,8 +84,18 @@ class MemriseImportSettings(QDialog):
         # sync theme setting
         self.themeWidget(r).setCurrentIndex(self.themeWidget(rC).currentIndex())
 
+    def rename_NT(self):
+        # determine row
+        for r in range(len(self.courseTabs)):
+            if self.noteTypeWidget(r).lineEdit() == self.sender():
+                break
+
+        index = self.noteTypeWidget(r).currentIndex()
+        for rC in range(len(self.courseTabs)):
+            self.noteTypeWidget(rC).setItemText(index, self.noteTypeWidget(r).currentText())
+
     def switch_theme(self):
-        # determine index
+        # determine row
         for r in range(len(self.courseTabs)):
             if self.themeWidget(r) == self.sender():
                 break
@@ -107,6 +116,7 @@ class MemriseImportSettings(QDialog):
         self.coursesTable.setCellWidget(row, 0, course)
 
         noteType_drop = NoScrollComboBox()
+        noteType_drop.setEditable(True)
         noteType_drop.addItems([f"(auto {n+1})" for n in range(len(self.courseTabs))])
         noteType_drop.insertSeparator(noteType_drop.count())
         noteType_drop.addItems([m["name"] for m in self.models])
@@ -114,6 +124,7 @@ class MemriseImportSettings(QDialog):
         self.coursesTable.setCellWidget(row, 1, noteType_drop)
 
         noteType_drop.currentIndexChanged.connect(self.switch_NT)
+        noteType_drop.lineEdit().textEdited.connect(self.rename_NT)
 
         theme_drop = NoScrollComboBox()
         theme_drop.addItems(self.themes)
@@ -189,7 +200,7 @@ class MemriseImportSettings(QDialog):
         headerMaster = self.coursesTable.horizontalHeader()
         self.coursesTable.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
         headerMaster.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        self.coursesTable.setColumnWidth(1, int(6 * lh))
+        self.coursesTable.setColumnWidth(1, int(9 * lh))
         self.coursesTable.setColumnWidth(2, int(5.5 * lh))
         self.coursesTable.setColumnWidth(3, int(3.5 * lh))
         headerMaster.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Interactive)
