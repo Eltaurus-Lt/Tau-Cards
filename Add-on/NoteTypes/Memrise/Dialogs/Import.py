@@ -33,7 +33,6 @@ from ....py.utils import files
 # from ....py.utils import console
 
 # todo:
-## filter out cloze NTs
 ## rename nt
 ## unchecked import -> disable theme and nt
 ## disable renaming existing nts
@@ -159,7 +158,7 @@ class MemriseImportSettings(QDialog):
             }
         """
 
-        self.models = mw.col.models.all()
+        self.models = [m for m in mw.col.models.all() if m["type"] == 0] # non cloze or image-occlusion note types
         self.themes = utils.list_themes()
 
         ## Widgets
