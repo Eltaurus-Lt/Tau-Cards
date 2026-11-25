@@ -38,6 +38,7 @@ from ...py.utils import console
 # # # merge notes (learnable id == in different directions??)
 # # # reverse Q
 # # # revlog
+
 # # choices
 # # # fill
 # # # convert img and audio 
@@ -45,7 +46,9 @@ from ...py.utils import console
 # # interface
 # # # !progress bar
 # # # renamable NTs
-# # # move theme inside the table ( existing NT - deactivate; new NT - change for all courses with same NT when changed / autochange when NT is changed to new and used by other course)
+# # # move theme inside the table ( existing NT - deactivate)
+
+
 
 # heuristics
 # # autofill onscreen keyboard
@@ -72,7 +75,7 @@ from ...py.utils import console
 # # QueryOp
 # # fsrs by default (+adv setting) | import difficulty
 # interface: selectable rows for batch setup (fix height)
-# media renames
+# media renames (+choices)
 # # restyle deck overview thumnails (name max-width)
 
 

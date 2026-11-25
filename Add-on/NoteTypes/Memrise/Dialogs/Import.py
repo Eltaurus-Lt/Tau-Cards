@@ -28,12 +28,14 @@ from ....py.Dialogs import *
 
 from .. import utils
 from ....py.utils import files
-from ....py.utils import console
+
+# from aqt.utils import tooltip
+# from ....py.utils import console
 
 # todo:
-## nt -> load theme
 ## existing nt -> disable / enable theme
 ## rename nt
+## unchecked import -> disable theme and nt
 ## disable renaming existing nts
 
 class MemriseImportSettings(QDialog):
@@ -51,8 +53,30 @@ class MemriseImportSettings(QDialog):
             table.setHorizontalHeaderItem(i, header_widget)
 
 
+    def switch_NT(self):
+        # determine index
+        for r in range(len(self.courseTabs)):
+            if self.coursesTable.cellWidget(r, 1) == self.sender():
+                break
+        
+        # find same NT
+        rC = 0
+        while rC < len(self.courseTabs):
+            if (not rC == r and 
+                self.coursesTable.cellWidget(r, 1).currentText()
+                == self.coursesTable.cellWidget(rC, 1).currentText()
+            ):
+                break
+            rC += 1
+
+        if rC < len(self.courseTabs):
+            # sync theme setting
+            new_index = self.coursesTable.cellWidget(rC, 2).currentIndex()
+            self.coursesTable.cellWidget(r, 2).setCurrentIndex(new_index)
+            return
+
     def switch_theme(self):
-        # find index
+        # determine index
         for r in range(len(self.courseTabs)):
             if self.coursesTable.cellWidget(r, 2) == self.sender():
                 break
@@ -80,6 +104,8 @@ class MemriseImportSettings(QDialog):
         noteType_drop.addItems([m["name"] for m in self.models])
         noteType_drop.setCurrentIndex(row)
         self.coursesTable.setCellWidget(row, 1, noteType_drop)
+
+        noteType_drop.currentIndexChanged.connect(self.switch_NT)
 
         theme_drop = NoScrollComboBox()
         theme_drop.addItems(self.themes)
@@ -142,7 +168,8 @@ class MemriseImportSettings(QDialog):
             ("Course", None),
             ("Note Type", None),
             ("Theme", None),
-            ("Import", None)])
+            ("Import", None)
+            ])
         self.coursesTable.horizontalHeader().setMinimumSectionSize(2 * lh)
         self.coursesTable.setSelectionMode(QtWidgets.QTableWidget.SelectionMode.NoSelection)
         self.coursesTable.cellClicked.connect(lambda r, c: self.toggleCellCheckbox(self.coursesTable.cellWidget(r, c)))
@@ -331,9 +358,9 @@ class MemriseImportSettings(QDialog):
         for row in range(len(self.courseTabs)):
             if self.coursesTable.cellWidget(row, 3).layout().itemAt(0).widget().isChecked():
                 importTabs.append(self.courseTabs[row])
-                importTabs[-1]["Theme"] = self.coursesTable.cellWidget(row, 2).currentText()
                 importTabs[-1]["Note Type"] = self.coursesTable.cellWidget(row, 1).currentText()
                 importTabs[-1]["NT_isNew"] = self.coursesTable.cellWidget(row, 1).currentIndex() < len(self.courseTabs)
+                importTabs[-1]["Theme"] = self.coursesTable.cellWidget(row, 2).currentText()
 
         return importTabs
 
