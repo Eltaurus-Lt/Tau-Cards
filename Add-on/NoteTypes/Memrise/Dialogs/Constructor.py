@@ -398,9 +398,9 @@ class ConstructorDialog(QDialog):
 
         # Add the respective item to qboxes for each card type
         for r in range(self.cardTypes.rowCount()):
-            self.cardTypes.cellWidget(r, 1).addItem(field_name) #question
-            self.cardTypes.cellWidget(r, 2).addItem(field_name) #answer
-            self.cardTypes.cellWidget(r, 5).addItem(field_name) #extra
+            self.cardTypes.cellWidget(r, 1).addItem(field_name) # question
+            self.cardTypes.cellWidget(r, 2).addItem(field_name) # answer
+            self.cardTypes.cellWidget(r, 5).addItem(field_name) # extra
 
         self.modificationListener(self.fieldsTable, row)
         self.markAsModified()
@@ -415,9 +415,9 @@ class ConstructorDialog(QDialog):
 
         # Rename the respective item in qboxes for each card type
         for rC in range(self.cardTypes.rowCount()):
-            self.cardTypes.cellWidget(rC, 1).setItemText(r, new_name) #question
-            self.cardTypes.cellWidget(rC, 2).setItemText(r, new_name) #question
-            self.cardTypes.cellWidget(rC, 5).setItemText(r+1, new_name) #question
+            self.cardTypes.cellWidget(rC, 1).setItemText(r, new_name) # question
+            self.cardTypes.cellWidget(rC, 2).setItemText(r, new_name) # answer
+            self.cardTypes.cellWidget(rC, 5).setItemText(r+1, new_name) # extra
 
     def remove_field(self):
         sender_button = self.sender()
@@ -434,9 +434,9 @@ class ConstructorDialog(QDialog):
 
         # Remove the respective item from qboxes for each card type
         for rC in range(self.cardTypes.rowCount()):
-            self.cardTypes.cellWidget(rC, 1).removeItem(r) #question
-            self.cardTypes.cellWidget(rC, 2).removeItem(r) #answer
-            self.cardTypes.cellWidget(rC, 5).removeItem(r+1) #extra
+            self.cardTypes.cellWidget(rC, 1).removeItem(r) # question
+            self.cardTypes.cellWidget(rC, 2).removeItem(r) # answer
+            self.cardTypes.cellWidget(rC, 5).removeItem(r+1) # extra
 
         self.markAsModified()
 
