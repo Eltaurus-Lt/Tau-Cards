@@ -33,7 +33,6 @@ from ....py.utils import files
 # from ....py.utils import console
 
 # todo:
-## disable renaming existing nts
 ## unchecked import -> disable theme and nt
 
 class MemriseImportSettings(QDialog):
@@ -68,8 +67,11 @@ class MemriseImportSettings(QDialog):
 
         # disable theme selection for preexisting NTs
         if not self.NTisNew(r):
+            self.noteTypeWidget(r).setEditable(False)
             self.themeWidget(r).setEnabled(False)
             return
+        self.noteTypeWidget(r).setEditable(True)
+        self.noteTypeWidget(r).lineEdit().textEdited.connect(self.rename_NT)
         self.themeWidget(r).setEnabled(True)
         
         # find same NT
@@ -116,15 +118,18 @@ class MemriseImportSettings(QDialog):
         self.coursesTable.setCellWidget(row, 0, course)
 
         noteType_drop = NoScrollComboBox()
-        noteType_drop.setEditable(True)
         noteType_drop.addItems([f"(auto {n+1})" for n in range(len(self.courseTabs))])
         noteType_drop.insertSeparator(noteType_drop.count())
         noteType_drop.addItems([m["name"] for m in self.models])
         noteType_drop.setCurrentIndex(row)
         self.coursesTable.setCellWidget(row, 1, noteType_drop)
 
-        noteType_drop.currentIndexChanged.connect(self.switch_NT)
+        noteType_drop.setEditable(True)
+        noteType_drop.view().setMinimumWidth(
+            noteType_drop.view().sizeHintForColumn(0) # full-width dropdown
+        )
         noteType_drop.lineEdit().textEdited.connect(self.rename_NT)
+        noteType_drop.currentIndexChanged.connect(self.switch_NT)
 
         theme_drop = NoScrollComboBox()
         theme_drop.addItems(self.themes)
@@ -200,7 +205,7 @@ class MemriseImportSettings(QDialog):
         headerMaster = self.coursesTable.horizontalHeader()
         self.coursesTable.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
         headerMaster.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        self.coursesTable.setColumnWidth(1, int(9 * lh))
+        self.coursesTable.setColumnWidth(1, int(8.5 * lh))
         self.coursesTable.setColumnWidth(2, int(5.5 * lh))
         self.coursesTable.setColumnWidth(3, int(3.5 * lh))
         headerMaster.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Interactive)
