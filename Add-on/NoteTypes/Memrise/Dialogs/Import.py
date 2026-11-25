@@ -33,7 +33,7 @@ from ....py.utils import files
 # from ....py.utils import console
 
 # todo:
-## existing nt -> disable / enable theme
+## filter out cloze NTs
 ## rename nt
 ## unchecked import -> disable theme and nt
 ## disable renaming existing nts
@@ -52,43 +52,52 @@ class MemriseImportSettings(QDialog):
                 header_widget.setToolTip(tooltip)
             table.setHorizontalHeaderItem(i, header_widget)
 
+    def noteTypeWidget(self, row):
+        return self.coursesTable.cellWidget(row, 1)
+
+    def NTisNew(self, row):
+        return self.coursesTable.cellWidget(row, 1).currentIndex() < len(self.courseTabs)
+
+    def themeWidget(self, row):
+        return self.coursesTable.cellWidget(row, 2)
+
 
     def switch_NT(self):
         # determine index
         for r in range(len(self.courseTabs)):
-            if self.coursesTable.cellWidget(r, 1) == self.sender():
+            if self.noteTypeWidget(r) == self.sender():
                 break
+
+        # disable theme selection for preexisting NTs
+        if not self.NTisNew(r):
+            self.themeWidget(r).setEnabled(False)
+            return
+        self.themeWidget(r).setEnabled(True)
         
         # find same NT
         rC = 0
         while rC < len(self.courseTabs):
-            if (not rC == r and 
-                self.coursesTable.cellWidget(r, 1).currentText()
-                == self.coursesTable.cellWidget(rC, 1).currentText()
-            ):
+            if self.noteTypeWidget(r).currentText() == self.noteTypeWidget(rC).currentText() and rC != r:
                 break
             rC += 1
 
-        if rC < len(self.courseTabs):
-            # sync theme setting
-            new_index = self.coursesTable.cellWidget(rC, 2).currentIndex()
-            self.coursesTable.cellWidget(r, 2).setCurrentIndex(new_index)
+        if rC == len(self.courseTabs):
             return
+        # sync theme setting
+        self.themeWidget(r).setCurrentIndex(self.themeWidget(rC).currentIndex())
 
     def switch_theme(self):
         # determine index
         for r in range(len(self.courseTabs)):
-            if self.coursesTable.cellWidget(r, 2) == self.sender():
+            if self.themeWidget(r) == self.sender():
                 break
-        new_index = self.coursesTable.cellWidget(r, 2).currentIndex()
-        affected_NT = self.coursesTable.cellWidget(r, 1).currentIndex()
 
         for rC in range(len(self.courseTabs)):
             if (
-                not self.coursesTable.cellWidget(rC, 2) == self.sender()
-                and self.coursesTable.cellWidget(rC, 1).currentIndex() == affected_NT
+                not self.themeWidget(rC) == self.sender()
+                and self.noteTypeWidget(rC).currentIndex() == self.noteTypeWidget(r).currentIndex()
             ):
-                self.coursesTable.cellWidget(rC, 2).setCurrentIndex(new_index)
+                self.themeWidget(rC).setCurrentIndex(self.themeWidget(r).currentIndex())
 
 
     def add_courseRow(self, path):
@@ -358,9 +367,9 @@ class MemriseImportSettings(QDialog):
         for row in range(len(self.courseTabs)):
             if self.coursesTable.cellWidget(row, 3).layout().itemAt(0).widget().isChecked():
                 importTabs.append(self.courseTabs[row])
-                importTabs[-1]["Note Type"] = self.coursesTable.cellWidget(row, 1).currentText()
-                importTabs[-1]["NT_isNew"] = self.coursesTable.cellWidget(row, 1).currentIndex() < len(self.courseTabs)
-                importTabs[-1]["Theme"] = self.coursesTable.cellWidget(row, 2).currentText()
+                importTabs[-1]["Note Type"] = self.noteTypeWidget(row).currentText()
+                importTabs[-1]["NT_isNew"] = self.NTisNew(row)
+                importTabs[-1]["Theme"] = self.themeWidget(row).currentText()
 
         return importTabs
 
