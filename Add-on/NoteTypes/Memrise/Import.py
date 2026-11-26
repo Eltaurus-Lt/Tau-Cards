@@ -35,10 +35,11 @@ from aqt.utils import tooltip
 from ...py.utils import console
 
 # # import
+# # # merged nt not importing
 # # # !merge notes (learnable id == in different directions??)
-# # # reverse Q
 # # # !revlog
 
+# # reverse Q
 # # choices
 # # # fill
 # # # convert img and audio 
@@ -67,6 +68,7 @@ from ...py.utils import console
 # # check addon name when fresh-installing from aw/from folder
 # # coursedump crossrefs
 
+# todo:
 # # autobackup
 # # QueryOp
 # # fsrs by default (+adv setting) | import difficulty
@@ -169,7 +171,8 @@ def groupByNoteTypes(course_options):
         else:
             noteTypes[course["Note Type"]] = {
                 # assign unique names to auto (todo: move to .heuristics)
-                "name": course["name"] if (course["NT_isNew"] and course["Note Type"].startswith("(auto ") and course["Note Type"].endswith(")") ) else course["Note Type"], 
+                "name": course["name"] if (course["NT_isNew"] and course["Note Type"].startswith("(auto ") and course["Note Type"].endswith(")") ) else course["Note Type"],
+                "theme": course["Theme"],
                 "is_new": course["NT_isNew"],
                 "courses": [course]
             }
@@ -420,14 +423,17 @@ def Import(*args):
     # courses = [...{ name (str), id (int_str), deck_tree [str], folder (str), csv path (str) } ]
     courses = selectCourses()
 
-    # course_options = [...{ name (str), id (int_str), deck_tree [str], folder (str), csv path (str), Note Type (str), NT_isNew (✓) } ]
-    # import_options = { theme (str), import::meta (✓), import::media (✓), import::revlog (✓), tests::audio (✓), tests::typing (✓), tests::multichoice (✓), tests::tapping (✓), advanced::... (todo) }
+    # course_options = [...{ name (str), id (int_str), deck_tree [str], folder (str), csv path (str), Note Type (str), NT_isNew (✓), Theme (str) } ]
+    # import_options = { import ::meta (✓), ::media (✓), ::revlog (✓),
+    #                    tests ::audio (✓), ::typing (✓), ::multichoice (✓), ::tapping (✓), 
+    #                    advanced ::choices (str), ::reversed (str), ::subtree (✓), ::levels (str)
+    #                  }
     course_options, import_options = selectOptions(courses) or (None, None)
     if not course_options or not import_options: return
     if (not import_options["tests::tapping"] and not import_options["tests::multichoice"]):
         import_options["tests::typing"] = True
 
-    # noteType_courses = { ...noteType: { name (str), is_new (✓), courses: [...course] } }
+    # noteType_courses = { ...noteType: { name (str), is_new (✓), theme (str), courses: [...course] } }
     noteType_courses = groupByNoteTypes(course_options)
 
     for noteType in noteType_courses.values():
@@ -543,8 +549,8 @@ def Import(*args):
             noteType_setup = {
                 "Note Type": noteType["name"],
                 "Fields": field_data,
-                "Card Types": card_types, 
-                "Theme": import_options["theme"]
+                "Card Types": card_types,
+                "Theme": noteType["theme"]
             }
 
             model = Create.Assemble(noteType_setup)

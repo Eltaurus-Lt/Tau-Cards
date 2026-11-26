@@ -269,8 +269,10 @@ class MemriseImportSettings(QDialog):
         # decks group
         self.subdecks_checkbox = QCheckBox()
         self.subdecks_checkbox.setChecked(True)
-        self.levels_checkbox = QCheckBox()
-        self.levels_checkbox.setChecked(True)
+        self.levels_drop = QComboBox()
+        self.levels_drop.addItems(["Subdecks", "Tags", "Subdecks + Tags"])
+        self.levels_drop.setCurrentIndex(1)
+
 
 
 
@@ -383,8 +385,8 @@ class MemriseImportSettings(QDialog):
         subdeck_row.addSpacing(1 * lh)
 
         # levels_row = QHBoxLayout()
-        subdeck_row.addWidget(QLabel("Subdecks from levels"))
-        subdeck_row.addWidget(self.levels_checkbox)
+        subdeck_row.addWidget(QLabel("Levels: "))
+        subdeck_row.addWidget(self.levels_drop)
         subdeck_row.addStretch()
         subdecks_layout.addLayout(subdeck_row)
 
@@ -414,7 +416,7 @@ class MemriseImportSettings(QDialog):
     def course_options(self):
         importTabs = []
         for row in range(len(self.courseTabs)):
-            if self.toggleWidget(row).layout().itemAt(0).widget().isChecked():
+            if self.toggleWidget(row).isChecked():
                 importTabs.append(self.courseTabs[row])
                 importTabs[-1]["Note Type"] = self.noteTypeWidget(row).currentText()
                 importTabs[-1]["NT_isNew"] = self.NTisNew(row)
@@ -434,5 +436,5 @@ class MemriseImportSettings(QDialog):
                 "advanced::choices": self.choices_drop.currentText(),
                 "advanced::reversed": self.reverse_drop.currentText(),
                 "advanced::subtree": self.subdecks_checkbox.isChecked(),
-                "advanced::sublevels": self.levels_checkbox.isChecked(),
+                "advanced::levels": self.levels_drop.currentText(),
             }
