@@ -219,7 +219,7 @@ def Styling():
     main_style = file.contents(f"Template/Styling.css", __file__)
     themes = "\n\n\n".join([utils.load_theme(theme) for theme in utils.list_themes(False)])
 
-    return insertAtAnchor(main_style, ["⚓", "themes"], themes)
+    return f"/*  v{utils.version()}  */\n" + insertAtAnchor(main_style, ["⚓", "themes"], themes)
 
 
 
