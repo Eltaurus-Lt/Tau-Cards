@@ -32,9 +32,6 @@ from ....py.utils import files
 # from aqt.utils import tooltip
 # from ....py.utils import console
 
-# todo:
-## unchecked import -> disable theme and nt
-
 class MemriseImportSettings(QDialog):
     def toggleCellCheckbox(self, cellWidget):
         if cellWidget:
@@ -49,6 +46,10 @@ class MemriseImportSettings(QDialog):
                 header_widget.setToolTip(tooltip)
             table.setHorizontalHeaderItem(i, header_widget)
 
+
+    def courseWidget(self, row):
+        return self.coursesTable.cellWidget(row, 0)
+
     def noteTypeWidget(self, row):
         return self.coursesTable.cellWidget(row, 1)
 
@@ -57,6 +58,9 @@ class MemriseImportSettings(QDialog):
 
     def themeWidget(self, row):
         return self.coursesTable.cellWidget(row, 2)
+
+    def toggleWidget(self, row):
+        return self.coursesTable.cellWidget(row, 3).findChild(QCheckBox)
 
 
     def switch_NT(self):
@@ -109,6 +113,24 @@ class MemriseImportSettings(QDialog):
             ):
                 self.themeWidget(rC).setCurrentIndex(self.themeWidget(r).currentIndex())
 
+    def course_toggle(self, state):
+        # determine row
+        for r in range(len(self.courseTabs)):
+            if self.toggleWidget(r) == self.sender():
+                break
+
+        if state:
+            self.courseWidget(r).setEnabled(True)
+            self.noteTypeWidget(r).setEnabled(True)
+            if self.NTisNew(r):
+                self.themeWidget(r).setEnabled(True)
+        else:
+            self.courseWidget(r).setEnabled(False)
+            self.noteTypeWidget(r).setEnabled(False)
+            self.themeWidget(r).setEnabled(False)
+
+
+
 
     def add_courseRow(self, path):
         row = self.coursesTable.rowCount()
@@ -147,6 +169,8 @@ class MemriseImportSettings(QDialog):
         checkbox_cell.setLayout(checkbox_layout)
         checkbox_layout.addWidget(import_checkbox)
         self.coursesTable.setCellWidget(row, 3, checkbox_cell)
+
+        import_checkbox.stateChanged.connect(self.course_toggle)
 
 
     def __init__(self, courses):
@@ -390,7 +414,7 @@ class MemriseImportSettings(QDialog):
     def course_options(self):
         importTabs = []
         for row in range(len(self.courseTabs)):
-            if self.coursesTable.cellWidget(row, 3).layout().itemAt(0).widget().isChecked():
+            if self.toggleWidget(row).layout().itemAt(0).widget().isChecked():
                 importTabs.append(self.courseTabs[row])
                 importTabs[-1]["Note Type"] = self.noteTypeWidget(row).currentText()
                 importTabs[-1]["NT_isNew"] = self.NTisNew(row)
