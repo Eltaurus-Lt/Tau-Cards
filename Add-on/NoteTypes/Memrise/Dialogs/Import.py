@@ -184,7 +184,8 @@ class MemriseImportSettings(QDialog):
         coursesLable = QLabel("Courses")
         font_metrics = QFontMetrics(coursesLable.font())
         lh = font_metrics.lineSpacing()
-        self.setMinimumWidth(42 * lh)
+        self.setMinimumWidth(35 * lh)
+        self.resize(42 * lh, self.height())
 
         # Main table
         self.coursesTable = QTableWidget(0, 4)
@@ -205,7 +206,7 @@ class MemriseImportSettings(QDialog):
         headerMaster = self.coursesTable.horizontalHeader()
         self.coursesTable.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
         headerMaster.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
-        self.coursesTable.setColumnWidth(1, int(8.5 * lh))
+        self.coursesTable.setColumnWidth(1, int(8 * lh))
         self.coursesTable.setColumnWidth(2, int(5.5 * lh))
         self.coursesTable.setColumnWidth(3, int(3.5 * lh))
         headerMaster.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeMode.Interactive)
@@ -233,7 +234,7 @@ class MemriseImportSettings(QDialog):
 
         # multiple choice filling
         self.choices_drop = QComboBox()
-        self.choices_drop.addItems(["Leave empty", "Import", "Autofill", "Autofill empty"])
+        self.choices_drop.addItems(["Leave empty", "Import", "Fill", "Import + Fill", "Import + Fill empty"])
         self.choices_drop.setCurrentIndex(1)
 
         # reverse tests
@@ -325,16 +326,24 @@ class MemriseImportSettings(QDialog):
 
 
         choices_row = QHBoxLayout()
-        choices_row.addWidget(QLabel("Choices: "))
+        choices_row.addSpacing(int(.5 * lh))
+        choices_row.addWidget(QLabel("Multiple Choices: "))
         choices_row.addWidget(self.choices_drop)
+        # choices_row.addStretch()
+        choices_row.addSpacing(1 * lh)
+        # adv_layout.addLayout(choices_row)
+
+        div = QFrame()
+        div.setFrameShape(QFrame.Shape.VLine)
+        div.setFrameShadow(QFrame.Shadow.Sunken)
+        choices_row.addWidget(div)
+
+        # reverse_row = QHBoxLayout()
+        choices_row.addSpacing(1 * lh)
+        choices_row.addWidget(QLabel("Reverse Cards: "))
+        choices_row.addWidget(self.reverse_drop)
         choices_row.addStretch()
         adv_layout.addLayout(choices_row)
-
-        reverse_row = QHBoxLayout()
-        reverse_row.addWidget(QLabel("Reverse Cards: "))
-        reverse_row.addWidget(self.reverse_drop)
-        reverse_row.addStretch()
-        adv_layout.addLayout(reverse_row)
 
 
         subdecks_group = QGroupBox("Subdecks")
@@ -343,16 +352,17 @@ class MemriseImportSettings(QDialog):
         adv_layout.addWidget(subdecks_group)
 
         subdeck_row = QHBoxLayout()
-        subdeck_row.addWidget(QLabel("Replicate folder tree"))
+        subdeck_row.addWidget(QLabel("Deck tree from folders"))
         subdeck_row.addWidget(self.subdecks_checkbox)
+        # subdeck_row.addStretch()
+        # subdecks_layout.addLayout(subdeck_row)
+        subdeck_row.addSpacing(1 * lh)
+
+        # levels_row = QHBoxLayout()
+        subdeck_row.addWidget(QLabel("Subdecks from levels"))
+        subdeck_row.addWidget(self.levels_checkbox)
         subdeck_row.addStretch()
         subdecks_layout.addLayout(subdeck_row)
-
-        levels_row = QHBoxLayout()
-        levels_row.addWidget(QLabel("Subdecks from levels"))
-        levels_row.addWidget(self.levels_checkbox)
-        levels_row.addStretch()
-        subdecks_layout.addLayout(levels_row)
 
 
         # Ok/Cancel + Help
