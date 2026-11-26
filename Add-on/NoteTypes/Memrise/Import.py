@@ -35,7 +35,6 @@ from aqt.utils import tooltip
 from ...py.utils import console
 
 # # import
-# # # merged nt not importing
 # # # !merge notes (learnable id == in different directions??)
 # # # !revlog
 
@@ -43,6 +42,7 @@ from ...py.utils import console
 # # choices
 # # # fill
 # # # convert img and audio 
+# # option to not import/hide on the back Learnable ID
 
 # # # !progress bar
 
@@ -59,16 +59,18 @@ from ...py.utils import console
 # # # (old) courses with no headers in csv
 # # # user themes
 # # # selected folders have no courses
-# # # option to not import/hide on the back Learnable ID
 # # # ... todos
 # # # mw.reset()
 
+
 # # license urls
+# # coffee link
 # # # help button url
 # # check addon name when fresh-installing from aw/from folder
 # # coursedump crossrefs
 
 # todo:
+# # merge flag fields
 # # autobackup
 # # QueryOp
 # # fsrs by default (+adv setting) | import difficulty
@@ -602,7 +604,7 @@ def Import(*args):
                 if mem_card and mem_card["Level"]:
                     level = mem_card["Level"].replace("::", "_")
                     level_N, level_name = re.match(r'(\d+)\s*(.*)', level).groups()
-                    level_did = mw.col.decks.id(f"{full_deck_name}::L{level_N}. {level_name}")
+                    level_did = mw.col.decks.id(f"{note_data["Deck"]}::L{level_N}. {level_name}")
                     if level_did is None:
                         continue
                     mw.col.set_deck([card_id], level_did)
